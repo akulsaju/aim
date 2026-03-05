@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIM Studio - AI Model Trainer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🎯 AIM Studio</h1>
+            <p class="tagline">Train simple AI text models with Markov chains</p>
+        </header>
+
+        <!-- Status Bar -->
+        <div class="status-bar" id="statusBar">
+            <span id="statusText">No model loaded</span>
+            <span id="modelInfo" class="model-info"></span>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Section 1: Train Model -->
+            <section class="card" id="trainSection">
+                <h2>📚 Train Model</h2>
+                <p class="description">Enter or paste your training text below. The system will learn patterns and word transitions.</p>
+                
+                <div class="form-group">
+                    <label for="trainingText">Training Text:</label>
+                    <textarea 
+                        id="trainingText" 
+                        placeholder="Paste your training text here... (the more text, the better the model)"
+                        rows="8"
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="modelOrder">Model Order (complexity):</label>
+                    <select id="modelOrder">
+                        <option value="1">1 - Simple (single word context)</option>
+                        <option value="2" selected>2 - Standard (two word context)</option>
+                        <option value="3">3 - Advanced (three word context)</option>
+                    </select>
+                    <small>Higher order = more coherent but needs more training data</small>
+                </div>
+
+                <button class="btn btn-primary" onclick="trainModel()">
+                    Train Model
+                </button>
+
+                <div id="trainStatus" class="status-message"></div>
+            </section>
+
+            <!-- Section 2: Generate Text -->
+            <section class="card" id="generateSection">
+                <h2>✨ Generate Text</h2>
+                <p class="description">Use the trained model to generate new text. Optionally provide a prompt to guide generation.</p>
+                
+                <div class="form-group">
+                    <label for="promptText">Prompt (optional):</label>
+                    <input 
+                        type="text" 
+                        id="promptText" 
+                        placeholder="Enter starting words... (leave empty for random start)"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="maxLength">Maximum Words:</label>
+                    <input 
+                        type="number" 
+                        id="maxLength" 
+                        value="100" 
+                        min="10" 
+                        max="500"
+                    >
+                </div>
+
+                <button class="btn btn-primary" onclick="generateText()">
+                    Generate Text
+                </button>
+
+                <div class="form-group">
+                    <label>Generated Output:</label>
+                    <div id="generatedText" class="output-box">
+                        Generated text will appear here...
+                    </div>
+                </div>
+
+                <div id="generateStatus" class="status-message"></div>
+            </section>
+
+            <!-- Section 3: Export Model -->
+            <section class="card" id="exportSection">
+                <h2>💾 Export Model</h2>
+                <p class="description">Save your trained model as a .aim file to share or use later.</p>
+                
+                <div class="form-group">
+                    <label for="modelName">Model Name:</label>
+                    <input 
+                        type="text" 
+                        id="modelName" 
+                        placeholder="e.g., Shakespearean Text Generator"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="authorName">Author:</label>
+                    <input 
+                        type="text" 
+                        id="authorName" 
+                        placeholder="Your name"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="modelVersion">Version:</label>
+                    <input 
+                        type="text" 
+                        id="modelVersion" 
+                        value="1.0"
+                    >
+                </div>
+
+                <button class="btn btn-success" onclick="exportModel()">
+                    Export as .aim File
+                </button>
+
+                <div id="exportStatus" class="status-message"></div>
+            </section>
+
+            <!-- Section 4: Load Model -->
+            <section class="card" id="loadSection">
+                <h2>📂 Load Model</h2>
+                <p class="description">Load a previously saved .aim file to continue using a model.</p>
+                
+                <div class="form-group">
+                    <label for="modelFile">Choose .aim File:</label>
+                    <input 
+                        type="file" 
+                        id="modelFile" 
+                        accept=".aim"
+                        onchange="handleFileSelect(event)"
+                    >
+                </div>
+
+                <button class="btn btn-primary" onclick="loadModel()">
+                    Load Model
+                </button>
+
+                <div id="loadStatus" class="status-message"></div>
+
+                <!-- Available Models List -->
+                <div class="models-list">
+                    <h3>Available Models:</h3>
+                    <div id="modelsList">
+                        <p class="text-muted">Loading models...</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>AIM Studio - Open Source AI Model Trainer | Built with Flask + Markov Chains</p>
+            <p class="text-muted">Create, train, and share simple text generation models</p>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Processing...</p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
