@@ -324,10 +324,27 @@ async function addKnowledge() {
         return;
     }
     
-    // Split by newlines and filter empty
-    const sentences = text.split('\n')
+    // Split by newlines first
+    const lines = text.split('\n')
         .map(s => s.trim())
         .filter(s => s.length > 0);
+    
+    // Further split each line into sentences
+    const sentences = [];
+    for (const line of lines) {
+        // Split on period, exclamation, or question mark followed by space or end
+        const lineSentences = line.split(/([.!?])\s+/)
+            .reduce((acc, part, i, arr) => {
+                if (i % 2 === 0 && part) {
+                    const punct = arr[i + 1] || '';
+                    acc.push((part + punct).trim());
+                }
+                return acc;
+            }, [])
+            .filter(s => s.length > 10); // Only keep substantial sentences
+        
+        sentences.push(...lineSentences);
+    }
     
     if (sentences.length === 0) {
         showToast('No valid sentences found!', 2000);

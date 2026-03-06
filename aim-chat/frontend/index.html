@@ -116,10 +116,10 @@
                 <button class="modal-close" onclick="closeModal('addDataModal')">✕</button>
             </div>
             <div class="modal-body">
-                <p class="modal-desc">Add new knowledge sentences to the current model. Enter one sentence per line.</p>
+                <p class="modal-desc">Add new knowledge to the current model. Enter facts one per line, or paste paragraphs (they'll be automatically split into sentences).</p>
                 <textarea 
                     id="newKnowledge" 
-                    placeholder="The Earth orbits the Sun.&#10;Water is composed of hydrogen and oxygen.&#10;Light travels at 299,792 km/s."
+                    placeholder="Example format:&#10;&#10;Peter Burroughs is a British actor.&#10;He appeared in Flash Gordon and The Dark Crystal.&#10;He was born on January 27, 1947.&#10;&#10;Or paste full paragraphs - they'll be split automatically!"
                     rows="8"
                     class="modal-textarea"
                 ></textarea>

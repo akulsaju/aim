@@ -1,0 +1,29 @@
+{
+  "name": "PeopleAI",
+  "version": "1.0",
+  "type": "chat",
+  "description": "Knowledge about notable people",
+  "knowledge": [
+    "Peter Burroughs was born on 27 January 1947.",
+    "Peter Burroughs is a British television and film actor.",
+    "Peter Burroughs is the director of Willow Management.",
+    "Peter Burroughs initially ran a shop in his village at Yaxley, Cambridgeshire.",
+    "Peter Burroughs first dramatic role was that of the character Branic in the 1979 television series The Legend of King Arthur.",
+    "Peter Burroughs played roles in Hollywood movies such as Flash Gordon, The Dark Crystal, Labyrinth, and The Hitchhiker's Guide to the Galaxy.",
+    "Peter Burroughs portrayed a bank goblin in the Harry Potter series.",
+    "Peter Burroughs appeared in Harry Potter and the Philosopher's Stone.",
+    "Peter Burroughs appeared in Harry Potter and the Deathly Hallows Part 2.",
+    "Eddi McKee is a fictional character from the BBC medical drama Holby City.",
+    "Eddi McKee is played by actress Sarah-Jane Potts.",
+    "Eddi McKee first appeared in the thirteenth series episode Rescue Me, broadcast on 7 June 2011.",
+    "Eddi McKee was a Senior Nurse at Holby City Hospital.",
+    "Eddi McKee is portrayed as being straight-talking, no-nonsense, loyal and compassionate.",
+    "Eddi McKee believed the nurses did the most important job in the hospital.",
+    "Eddi McKee's younger brother is Liam, who was introduced to the show.",
+    "Eddi McKee had run away from home to escape their alcoholic mother.",
+    "Eddi McKee liked to drink to deal with her many issues.",
+    "Eddi McKee had a relationship with Luc Hemingway, which proved popular with viewers.",
+    "Eddi McKee became involved with locum consultant Max Schneider.",
+    "Eddi McKee developed an addiction to painkillers."
+  ]
+}
