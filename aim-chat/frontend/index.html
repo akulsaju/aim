@@ -41,6 +41,15 @@
                     🗑️ Clear Chat
                 </button>
             </div>
+            
+            <div class="sidebar-section">
+                <button class="btn btn-primary btn-full" onclick="showAddDataModal()">
+                    ➕ Add Knowledge
+                </button>
+                <button class="btn btn-success btn-full" style="margin-top: 0.5rem;" onclick="showCreateModelModal()">
+                    📝 New Model
+                </button>
+            </div>
         </aside>
 
         <!-- Chat Area -->
@@ -98,6 +107,68 @@
 
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
+
+    <!-- Add Knowledge Modal -->
+    <div class="modal" id="addDataModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>➕ Add Knowledge</h2>
+                <button class="modal-close" onclick="closeModal('addDataModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">Add new knowledge sentences to the current model. Enter one sentence per line.</p>
+                <textarea 
+                    id="newKnowledge" 
+                    placeholder="The Earth orbits the Sun.&#10;Water is composed of hydrogen and oxygen.&#10;Light travels at 299,792 km/s."
+                    rows="8"
+                    class="modal-textarea"
+                ></textarea>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeModal('addDataModal')">Cancel</button>
+                    <button class="btn btn-primary" onclick="addKnowledge()">Add Knowledge</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Model Modal -->
+    <div class="modal" id="createModelModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📝 Create New Model</h2>
+                <button class="modal-close" onclick="closeModal('createModelModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Model Name *</label>
+                    <input type="text" id="newModelName" placeholder="e.g., HistoryAI" class="modal-input">
+                </div>
+                <div class="form-group">
+                    <label>Version</label>
+                    <input type="text" id="newModelVersion" placeholder="1.0" value="1.0" class="modal-input">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="newModelDesc" placeholder="What does this model know?" class="modal-input">
+                </div>
+                <div class="form-group">
+                    <label>Knowledge Sentences *</label>
+                    <textarea 
+                        id="newModelKnowledge" 
+                        placeholder="One sentence per line:&#10;The Roman Empire fell in 476 AD.&#10;World War II ended in 1945."
+                        rows="8"
+                        class="modal-textarea"
+                    ></textarea>
+                    <small style="color: #6e6e80; font-size: 0.85rem;">Enter at least 5 knowledge sentences</small>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeModal('createModelModal')">Cancel</button>
+                    <button class="btn btn-success" onclick="createModel()">Create & Load</button>
+                    <button class="btn btn-primary" onclick="createAndSaveModel()">Create & Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>
