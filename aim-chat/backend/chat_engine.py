@@ -132,15 +132,23 @@ class ChatEngine:
                 return f"I don't have information about that. Try asking about: {topics}"
             return "I don't have information about that. Try asking something else!"
         
-        # Sort by relevance (highest score first)
-        scored_sentences.sort(key=lambda x: x[1], reverse=True)
+        # Sort by relevance, then by length (prefer longer, more informative sentences)
+        scored_sentences.sort(key=lambda x: (x[1], len(x[0])), reverse=True)
+        
+        # Get top candidates (all with same best score)
+        best_score = scored_sentences[0][1]
+        top_candidates = [s for s in scored_sentences if s[1] == best_score]
+        
+        # If multiple candidates with same score, prefer longer ones
+        if len(top_candidates) > 1:
+            top_candidates.sort(key=lambda x: len(x[0]), reverse=True)
         
         # If best score is very low, inform user
-        if scored_sentences[0][1] < 3:
-            return f"I'm not very confident, but here's what I found: {scored_sentences[0][0]}"
+        if best_score < 3:
+            return f"I'm not very confident, but here's what I found: {top_candidates[0][0]}"
         
-        # Return the best match
-        return scored_sentences[0][0]
+        # Return the best match (longest among highest scored)
+        return top_candidates[0][0]
     
     def chat(self, user_message):
         """

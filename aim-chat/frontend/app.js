@@ -539,5 +539,102 @@ async function createAndSaveModel() {
     }
 }
 
+/**
+ * Show scrape website modal
+ */
+function showScrapeModal() {
+    showModal('scrapeModal');
+}
+
+/**
+ * Scrape a website and convert to knowledge
+ */
+async function scrapeWebsite(shouldSave) {
+    const urlInput = document.getElementById('scrapeUrl');
+    const modelNameInput = document.getElementById('scrapeModelName');
+    
+    const url = urlInput.value.trim();
+    const modelName = modelNameInput.value.trim();
+    
+    if (!url) {
+        showToast('Please enter a URL!', 2000);
+        return;
+    }
+    
+    // Basic URL validation
+    try {
+        new URL(url);
+    } catch {
+        showToast('Please enter a valid URL!', 2000);
+        return;
+    }
+    
+    showLoading();
+    
+    try {
+        if (shouldSave) {
+            // Scrape and save as file
+            const response = await fetch(`${API_BASE}/scrape`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    url: url,
+                    model_name: modelName,
+                    save: true
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                showToast(`✅ Scraped ${data.data.sentences.length} sentences and saved!`, 3000);
+                
+                // Clear the form
+                urlInput.value = '';
+                modelNameInput.value = '';
+                
+                closeModal('scrapeModal');
+                
+                // Reload models list
+                loadAvailableModels();
+            } else {
+                showToast(`Error: ${data.error}`, 3000);
+            }
+        } else {
+            // Scrape and load directly
+            const response = await fetch(`${API_BASE}/scrape_and_load`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: url })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                currentModel = data.model_info;
+                isModelLoaded = true;
+                updateModelInfo(data.model_info);
+                showChatArea();
+                clearMessages();
+                
+                showToast(`✅ Scraped and loaded ${data.model_info.knowledge_count} sentences from ${data.source}!`, 3000);
+                
+                // Clear the form
+                urlInput.value = '';
+                modelNameInput.value = '';
+                
+                closeModal('scrapeModal');
+            } else {
+                showToast(`Error: ${data.error}`, 3000);
+            }
+        }
+    } catch (error) {
+        console.error('Scraping failed:', error);
+        showToast('Failed to scrape website. Check the URL and try again.', 3000);
+    } finally {
+        hideLoading();
+    }
+}
+
 // Refresh status every 10 seconds
 setInterval(checkServerStatus, 10000);

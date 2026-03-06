@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from model_loader import ModelLoader
 from chat_engine import ChatEngine
+from scraper import WebScraper
 
 app = Flask(__name__, static_folder='../frontend', static_url_path='')
 CORS(app)
@@ -20,6 +21,7 @@ CORS(app)
 # Initialize components
 model_loader = ModelLoader()
 chat_engine = ChatEngine()
+web_scraper = WebScraper()
 
 
 @app.route('/')
@@ -393,6 +395,119 @@ def get_knowledge():
         return jsonify({
             'knowledge': knowledge,
             'count': len(knowledge)
+        })
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/scrape', methods=['POST'])
+def scrape_website():
+    """
+    Scrape a website and convert to AIM knowledge
+    
+    Expected JSON:
+    {
+        "url": "https://en.wikipedia.org/wiki/Python_(programming_language)",
+        "model_name": "PythonAI",  // Optional
+        "save": true  // Optional - save as file
+    }
+    """
+    try:
+        data = request.get_json()
+        
+        if not data or 'url' not in data:
+            return jsonify({'error': 'URL is required'}), 400
+        
+        url = data['url'].strip()
+        model_name = data.get('model_name', '').strip()
+        should_save = data.get('save', False)
+        
+        if not url:
+            return jsonify({'error': 'URL cannot be empty'}), 400
+        
+        # Scrape the website
+        scraped_data = web_scraper.scrape_url(url)
+        
+        # If save is requested, save as .aim file
+        if should_save:
+            models_dir = os.path.join(os.path.dirname(__file__), '../models')
+            os.makedirs(models_dir, exist_ok=True)
+            
+            # Generate filename
+            safe_name = model_name or scraped_data['title']
+            safe_name = safe_name.replace(' ', '_').replace('/', '_')[:50]
+            filename = f"{safe_name}.aim"
+            filepath = os.path.join(models_dir, filename)
+            
+            # Save the file
+            save_info = web_scraper.save_as_aim(scraped_data, filepath, model_name)
+            
+            return jsonify({
+                'success': True,
+                'message': f'Scraped and saved {len(scraped_data["sentences"])} sentences',
+                'data': scraped_data,
+                'file': save_info
+            })
+        else:
+            # Just return the data without saving
+            return jsonify({
+                'success': True,
+                'message': f'Scraped {len(scraped_data["sentences"])} sentences',
+                'data': scraped_data
+            })
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/scrape_and_load', methods=['POST'])
+def scrape_and_load():
+    """
+    Scrape a website and immediately load it as the current model
+    
+    Expected JSON:
+    {
+        "url": "https://en.wikipedia.org/wiki/Artificial_intelligence"
+    }
+    """
+    try:
+        data = request.get_json()
+        
+        if not data or 'url' not in data:
+            return jsonify({'error': 'URL is required'}), 400
+        
+        url = data['url'].strip()
+        
+        if not url:
+            return jsonify({'error': 'URL cannot be empty'}), 400
+        
+        # Scrape the website
+        scraped_data = web_scraper.scrape_url(url)
+        
+        # Create model structure
+        model_data = {
+            "name": scraped_data['title'],
+            "version": "1.0",
+            "type": "chat",
+            "description": scraped_data['description'],
+            "knowledge": scraped_data['sentences']
+        }
+        
+        # Load into model loader
+        model_info = model_loader.load_from_json(model_data)
+        
+        # Update chat engine
+        knowledge = model_loader.get_knowledge()
+        chat_engine.set_knowledge(knowledge)
+        chat_engine.clear_history()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Scraped and loaded {len(scraped_data["sentences"])} sentences',
+            'model_info': model_info,
+            'source': scraped_data['source'],
+            'url': url
         })
     
     except Exception as e:
