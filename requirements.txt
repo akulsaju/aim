@@ -12,7 +12,9 @@ requests==2.31.0
 # Data Processing & Format Support
 beautifulsoup4==4.12.2
 PyPDF2==3.0.1
-lxml==4.9.3
+
+# Optional: XML parsing for advanced scraping
+# lxml==4.9.3  # Uncomment for enhanced web scraping
 
 # Testing & Development
 pytest==7.4.0
@@ -20,7 +22,9 @@ pytest-cov==4.1.0
 
 # Utilities
 python-dotenv==1.0.0
-Pillow==10.0.0  # For image processing plugins
+
+# Optional: Image processing (install separately if needed for image plugins)
+# Pillow==10.0.0  # Uncomment for image generation plugins
 
 # Optional: Advanced Engines (uncomment when implementing)
 # transformers==4.30.0  # For embedding and LLM engines
