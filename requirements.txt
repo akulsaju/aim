@@ -1,16 +1,33 @@
-# AIM Studio - Python Dependencies
+# AIM v3 - Python Dependencies
 
-# Web Framework
-Flask==2.3.0
+# Core Web Framework
+Flask==2.3.2
 Werkzeug==2.3.0
-
-# CORS Support for Frontend-Backend Communication
 Flask-CORS==4.0.0
 
-# Optional: For better JSON handling
-# python-json-logger==2.0.7
+# CLI & Package Management
+click==8.1.3
+requests==2.31.0
 
-# Development Dependencies (optional)
-# pytest==7.4.0
-# black==23.3.0
-# flake8==6.0.0
+# Data Processing & Format Support
+beautifulsoup4==4.12.2
+PyPDF2==3.0.1
+lxml==4.9.3
+
+# Testing & Development
+pytest==7.4.0
+pytest-cov==4.1.0
+
+# Utilities
+python-dotenv==1.0.0
+Pillow==10.0.0  # For image processing plugins
+
+# Optional: Advanced Engines (uncomment when implementing)
+# transformers==4.30.0  # For embedding and LLM engines
+# torch==2.0.0  # For deep learning models
+# scikit-learn==1.3.0  # For additional ML features
+
+# Optional: Production Server
+# gunicorn==21.2.0  # For production WSGI server
+# python-dotenv==1.0.0  # Environment variable management
+
