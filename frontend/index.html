@@ -3,170 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIM Studio - AI Model Trainer</title>
+    <title>AIM v3 - AI Model Studio</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header>
-            <h1>🎯 AIM Studio</h1>
-            <p class="tagline">Train simple AI text models with Markov chains</p>
-        </header>
-
-        <!-- Status Bar -->
-        <div class="status-bar" id="statusBar">
-            <span id="statusText">No model loaded</span>
-            <span id="modelInfo" class="model-info"></span>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="logo">⚡</span>
+                <h1>AIM Studio</h1>
+            </div>
+            <div class="nav-status" id="navStatus">
+                <span class="status-badge" id="statusBadge">Offline</span>
+            </div>
         </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="nav-menu">
+                <a href="#" class="nav-item active" data-tab="train">
+                    <span class="icon">📚</span>
+                    <span>Train</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="generate">
+                    <span class="icon">✨</span>
+                    <span>Generate</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="export">
+                    <span class="icon">💾</span>
+                    <span>Export</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="load">
+                    <span class="icon">📂</span>
+                    <span>Load</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="info">
+                    <span class="icon">ℹ️</span>
+                    <span>API Info</span>
+                </a>
+            </div>
+            <div class="sidebar-footer">
+                <div class="model-card" id="modelCard">
+                    <div class="model-status">No Model</div>
+                    <div class="model-details" id="modelDetails" style="display:none;">
+                        <div class="detail"><strong>Order:</strong> <span id="modelOrder">-</span></div>
+                        <div class="detail"><strong>Vocab:</strong> <span id="modelVocab">-</span></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
 
         <!-- Main Content -->
-        <div class="content">
-            <!-- Section 1: Train Model -->
-            <section class="card" id="trainSection">
-                <h2>📚 Train Model</h2>
-                <p class="description">Enter or paste your training text below. The system will learn patterns and word transitions.</p>
-                
-                <div class="form-group">
-                    <label for="trainingText">Training Text:</label>
-                    <textarea 
-                        id="trainingText" 
-                        placeholder="Paste your training text here... (the more text, the better the model)"
-                        rows="8"
-                    ></textarea>
+        <main class="content">
+            <!-- Train Tab -->
+            <section id="train" class="tab-content active">
+                <div class="content-header">
+                    <h2>Train Your Model</h2>
+                    <p>Teach AIM to generate text by providing training data</p>
                 </div>
 
-                <div class="form-group">
-                    <label for="modelOrder">Model Order (complexity):</label>
-                    <select id="modelOrder">
-                        <option value="1">1 - Simple (single word context)</option>
-                        <option value="2" selected>2 - Standard (two word context)</option>
-                        <option value="3">3 - Advanced (three word context)</option>
-                    </select>
-                    <small>Higher order = more coherent but needs more training data</small>
-                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Training Text</label>
+                            <textarea 
+                                id="trainingText"
+                                placeholder="Paste your training text here... The more text, the better the model learns patterns."
+                                rows="10"
+                            ></textarea>
+                            <small class="hint">Minimum 50 words recommended</small>
+                        </div>
 
-                <button class="btn btn-primary" onclick="trainModel()">
-                    Train Model
-                </button>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Model Order</label>
+                                <select id="modelOrder">
+                                    <option value="1">1 - Simple (1 word context)</option>
+                                    <option value="2" selected>2 - Standard (2 word context)</option>
+                                    <option value="3">3 - Advanced (3 word context)</option>
+                                </select>
+                                <small class="hint">Higher = more coherent, needs more data</small>
+                            </div>
+                        </div>
 
-                <div id="trainStatus" class="status-message"></div>
-            </section>
+                        <button class="btn btn-primary btn-lg" onclick="trainModel()">
+                            <span class="btn-icon">🚀</span>
+                            Train Model
+                        </button>
 
-            <!-- Section 2: Generate Text -->
-            <section class="card" id="generateSection">
-                <h2>✨ Generate Text</h2>
-                <p class="description">Use the trained model to generate new text. Optionally provide a prompt to guide generation.</p>
-                
-                <div class="form-group">
-                    <label for="promptText">Prompt (optional):</label>
-                    <input 
-                        type="text" 
-                        id="promptText" 
-                        placeholder="Enter starting words... (leave empty for random start)"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="maxLength">Maximum Words:</label>
-                    <input 
-                        type="number" 
-                        id="maxLength" 
-                        value="100" 
-                        min="10" 
-                        max="500"
-                    >
-                </div>
-
-                <button class="btn btn-primary" onclick="generateText()">
-                    Generate Text
-                </button>
-
-                <div class="form-group">
-                    <label>Generated Output:</label>
-                    <div id="generatedText" class="output-box">
-                        Generated text will appear here...
-                    </div>
-                </div>
-
-                <div id="generateStatus" class="status-message"></div>
-            </section>
-
-            <!-- Section 3: Export Model -->
-            <section class="card" id="exportSection">
-                <h2>💾 Export Model</h2>
-                <p class="description">Save your trained model as a .aim file to share or use later.</p>
-                
-                <div class="form-group">
-                    <label for="modelName">Model Name:</label>
-                    <input 
-                        type="text" 
-                        id="modelName" 
-                        placeholder="e.g., Shakespearean Text Generator"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="authorName">Author:</label>
-                    <input 
-                        type="text" 
-                        id="authorName" 
-                        placeholder="Your name"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="modelVersion">Version:</label>
-                    <input 
-                        type="text" 
-                        id="modelVersion" 
-                        value="1.0"
-                    >
-                </div>
-
-                <button class="btn btn-success" onclick="exportModel()">
-                    Export as .aim File
-                </button>
-
-                <div id="exportStatus" class="status-message"></div>
-            </section>
-
-            <!-- Section 4: Load Model -->
-            <section class="card" id="loadSection">
-                <h2>📂 Load Model</h2>
-                <p class="description">Load a previously saved .aim file to continue using a model.</p>
-                
-                <div class="form-group">
-                    <label for="modelFile">Choose .aim File:</label>
-                    <input 
-                        type="file" 
-                        id="modelFile" 
-                        accept=".aim"
-                        onchange="handleFileSelect(event)"
-                    >
-                </div>
-
-                <button class="btn btn-primary" onclick="loadModel()">
-                    Load Model
-                </button>
-
-                <div id="loadStatus" class="status-message"></div>
-
-                <!-- Available Models List -->
-                <div class="models-list">
-                    <h3>Available Models:</h3>
-                    <div id="modelsList">
-                        <p class="text-muted">Loading models...</p>
+                        <div id="trainStatus" class="status-message"></div>
                     </div>
                 </div>
             </section>
-        </div>
 
-        <!-- Footer -->
-        <footer>
-            <p>AIM Studio - Open Source AI Model Trainer | Built with Flask + Markov Chains</p>
-            <p class="text-muted">Create, train, and share simple text generation models</p>
-        </footer>
+            <!-- Generate Tab -->
+            <section id="generate" class="tab-content">
+                <div class="content-header">
+                    <h2>Generate Text</h2>
+                    <p>Create new text using your trained model</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Prompt (Optional)</label>
+                            <input 
+                                type="text"
+                                id="promptText"
+                                placeholder="Enter starting words... (leave empty for random)"
+                            >
+                            <small class="hint">Guide generation with an opening phrase</small>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Max Words</label>
+                                <input 
+                                    type="number"
+                                    id="maxLength"
+                                    value="100"
+                                    min="10"
+                                    max="500"
+                                >
+                            </div>
+                            <div class="form-group">
+                                <label>Temperature</label>
+                                <input 
+                                    type="range"
+                                    id="temperature"
+                                    min="0.1"
+                                    max="2"
+                                    step="0.1"
+                                    value="1"
+                                >
+                                <small id="tempValue">1.0</small>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary btn-lg" onclick="generateText()">
+                            <span class="btn-icon">✨</span>
+                            Generate
+                        </button>
+
+                        <div id="generateStatus" class="status-message"></div>
+
+                        <div class="output-section">
+                            <label>Generated Output</label>
+                            <div id="generatedText" class="output-box">
+                                Generated text will appear here...
+                            </div>
+                            <button class="btn btn-secondary btn-sm" onclick="copyGenerated()" style="display:none;" id="copyBtn">
+                                📋 Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Export Tab -->
+            <section id="export" class="tab-content">
+                <div class="content-header">
+                    <h2>Export Model</h2>
+                    <p>Save your model as a .aim file for sharing</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Model Name</label>
+                            <input 
+                                type="text"
+                                id="modelName"
+                                placeholder="e.g., Poetry Generator"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label>Author Name</label>
+                            <input 
+                                type="text"
+                                id="authorName"
+                                placeholder="Your name or handle"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea 
+                                id="modelDescription"
+                                placeholder="Describe what this model does..."
+                                rows="4"
+                            ></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Version</label>
+                                <input 
+                                    type="text"
+                                    id="modelVersion"
+                                    value="1.0"
+                                    placeholder="1.0"
+                                >
+                            </div>
+                        </div>
+
+                        <button class="btn btn-success btn-lg" onclick="exportModel()">
+                            <span class="btn-icon">💾</span>
+                            Export as .aim File
+                        </button>
+
+                        <div id="exportStatus" class="status-message"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Load Tab -->
+            <section id="load" class="tab-content">
+                <div class="content-header">
+                    <h2>Load Model</h2>
+                    <p>Load a previously saved .aim file</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Select .aim File</label>
+                            <div class="file-input">
+                                <input 
+                                    type="file"
+                                    id="modelFile"
+                                    accept=".aim"
+                                    onchange="handleFileSelect(event)"
+                                >
+                                <span id="fileName">Choose a file...</span>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary btn-lg" onclick="loadModel()">
+                            <span class="btn-icon">📂</span>
+                            Load Model
+                        </button>
+
+                        <div id="loadStatus" class="status-message"></div>
+
+                        <div class="models-section">
+                            <h3>Available Models</h3>
+                            <div id="modelsList" class="models-grid">
+                                <p class="text-muted">Loading models...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Info Tab -->
+            <section id="info" class="tab-content">
+                <div class="content-header">
+                    <h2>API & System Info</h2>
+                    <p>Detailed information about the AIM system</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div id="apiInfo">Loading system information...</div>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
 
     <!-- Loading Overlay -->
@@ -174,6 +282,9 @@
         <div class="spinner"></div>
         <p>Processing...</p>
     </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
 
     <script src="app.js"></script>
 </body>
