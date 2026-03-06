@@ -1,0 +1,7 @@
+{
+  "name": "image_generator",
+  "version": "1.0.0",
+  "description": "Generate images from text descriptions",
+  "author": "AIM Team",
+  "config": {}
+}

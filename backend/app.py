@@ -1,29 +1,43 @@
 """
-AIM Studio - Flask Backend API
-This is the main Flask application that provides REST API endpoints
-for training models, generating text, and managing .aim model files.
+AIM Studio v3 - Flask Backend API
+REST API for AIM Model Ecosystem
 """
 
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import json
 import os
+import sys
+from pathlib import Path
 from datetime import datetime
 
+# Add parent directories to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from aim_core import AIMModel, AIMManifest, create_manifest, get_engine, list_engines
+from aim_hub import Registry, RegistryClient
+from aim_core.plugins import get_plugin_manager
+
+# Legacy imports for backward compatibility
 from trainer import MarkovTrainer, train_model
 from generator import MarkovGenerator, generate_text
 
 
 # Initialize Flask app
 app = Flask(__name__, static_folder='../frontend', static_url_path='')
-CORS(app)  # Enable CORS for frontend communication
+CORS(app)
 
 # Configure paths
-MODELS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'models')
-os.makedirs(MODELS_DIR, exist_ok=True)
+MODELS_DIR = Path(__file__).parent.parent / 'models'
+MODELS_DIR.mkdir(exist_ok=True)
 
-# Store the current model in memory
+# Initialize AIM components
+local_registry = Registry()
+plugin_manager = get_plugin_manager()
+
+# Store current model
 current_model = None
+current_aim_model = None
 
 
 @app.route('/')
@@ -343,6 +357,301 @@ def status():
         'vocabulary_size': model_data['vocabulary_size'],
         'transitions_count': len(model_data['transitions'])
     }), 200
+
+
+# ============================================================
+# AIM v3 API Endpoints
+# ============================================================
+
+@app.route('/api/v3/engines', methods=['GET'])
+def get_engines():
+    """
+    Get list of available AIM engines.
+    
+    Returns:
+        JSON list of supported engines
+    """
+    return jsonify({
+        'success': True,
+        'engines': list_engines(),
+        'descriptions': {
+            'markov': 'Statistical text generation using Markov chains',
+            'ngram': 'N-gram language model for text prediction',
+            'embedding': 'Vector embedding-based similarity',
+            'llm': 'Large Language Model interface'
+        }
+    }), 200
+
+
+@app.route('/api/v3/train', methods=['POST'])
+def train_v3():
+    """
+    Train a model using AIM v3 system.
+    
+    Expected JSON:
+        {
+            "name": "Model Name",
+            "author": "Your Name",
+            "type": "text",
+            "engine": "markov",
+            "text": "training data...",
+            "engine_config": { ... }
+        }
+    """
+    global current_aim_model
+    
+    try:
+        data = request.get_json()
+        
+        if not data or 'text' not in data:
+            return jsonify({'error': 'text field required'}), 400
+        
+        # Get parameters
+        name = data.get('name', 'Untitled Model')
+        author = data.get('author', 'Anonymous')
+        engine = data.get('engine', 'markov')
+        model_type = data.get('type', 'text')
+        text_data = data['text']
+        engine_config = data.get('engine_config', {})
+        
+        # Create and train model
+        model = AIMModel.create(
+            name=name,
+            author=author,
+            engine=engine,
+            model_type=model_type,
+            description=data.get('description', '')
+        )
+        
+        # Train
+        stats = model.train(text_data, **engine_config)
+        current_aim_model = model
+        
+        return jsonify({
+            'success': True,
+            'message': 'Model trained successfully',
+            'model': str(model),
+            'stats': stats
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/v3/generate', methods=['POST'])
+def generate_v3():
+    """
+    Generate output using v3 model.
+    
+    Expected JSON:
+        {
+            "prompt": "optional prompt",
+            "max_length": 100,
+            "temperature": 1.0
+        }
+    """
+    global current_aim_model
+    
+    if current_aim_model is None:
+        return jsonify({'error': 'No model trained or loaded'}), 400
+    
+    try:
+        data = request.get_json() or {}
+        
+        output = current_aim_model.generate(
+            prompt=data.get('prompt'),
+            max_length=data.get('max_length', 100),
+            temperature=data.get('temperature', 1.0)
+        )
+        
+        return jsonify({
+            'success': True,
+            'output': output
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/v3/save', methods=['POST'])
+def save_v3():
+    """
+    Save current model as .aim file.
+    
+    Expected JSON:
+        {
+            "filename": "mymodel.aim"  # optional
+        }
+    """
+    global current_aim_model
+    
+    if current_aim_model is None:
+        return jsonify({'error': 'No model to save'}), 400
+    
+    try:
+        data = request.get_json() or {}
+        filepath = data.get('filename')
+        
+        if filepath:
+            filepath = os.path.join(MODELS_DIR, filepath)
+        else:
+            filepath = os.path.join(MODELS_DIR, None)
+        
+        saved_path = current_aim_model.save(filepath)
+        
+        # Register in local registry
+        local_registry.register(
+            current_aim_model.manifest['name'],
+            saved_path,
+            current_aim_model.manifest.to_dict()
+        )
+        
+        return jsonify({
+            'success': True,
+            'path': saved_path,
+            'size_kb': os.path.getsize(saved_path) / 1024
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/v3/load', methods=['POST'])
+def load_v3():
+    """
+    Load a .aim file.
+    
+    Expected:
+        POST with 'file' parameter (multipart form-data)
+        OR JSON with 'path' field (for pre-existing .aim files)
+    """
+    global current_aim_model
+    
+    try:
+        filepath = None
+        
+        # Try to get file from form data
+        if 'file' in request.files:
+            file = request.files['file']
+            if file.filename:
+                filepath = os.path.join(MODELS_DIR, file.filename)
+                file.save(filepath)
+        else:
+            # Try to get path from JSON
+            data = request.get_json() or {}
+            if 'path' in data:
+                filepath = data['path']
+        
+        if not filepath:
+            return jsonify({'error': 'No file or path provided'}), 400
+        
+        # Load with AIM system
+        current_aim_model = AIMModel.load(filepath)
+        
+        return jsonify({
+            'success': True,
+            'model': str(current_aim_model),
+            'info': current_aim_model.info()
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/v3/registry/list', methods=['GET'])
+def registry_list():
+    """List models in local registry."""
+    models = local_registry.list()
+    
+    result = []
+    for name in models:
+        info = local_registry.get(name)
+        result.append({
+            'name': name,
+            'path': info['path'],
+            'registered': info['registered']
+        })
+    
+    return jsonify({
+        'success': True,
+        'models': result
+    }), 200
+
+
+@app.route('/api/v3/registry/search', methods=['GET'])
+def registry_search():
+    """
+    Search public registry (aimhub.org).
+    
+    Query parameters:
+        ?q=query&tags=tag1,tag2&limit=10
+    """
+    try:
+        query = request.args.get('q', '')
+        tags = request.args.get('tags', '').split(',') if request.args.get('tags') else []
+        limit = int(request.args.get('limit', 10))
+        
+        client = RegistryClient('https://aimhub.org')
+        results = client.search(query, tags=tags, limit=limit)
+        
+        return jsonify({
+            'success': True,
+            'results': results
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/v3/plugins', methods=['GET'])
+def get_plugins():
+    """List all available plugins."""
+    plugins = plugin_manager.list_plugins()
+    
+    result = []
+    for name in plugins:
+        try:
+            info = plugin_manager.get_plugin_info(name)
+            result.append(info)
+        except:
+            pass
+    
+    return jsonify({
+        'success': True,
+        'plugins': result
+    }), 200
+
+
+@app.route('/api/v3/plugins/<name>/execute', methods=['POST'])
+def execute_plugin(name):
+    """
+    Execute a plugin.
+    
+    Expected JSON:
+        {
+            "input": "plugin input data",
+            "args": { ... }
+        }
+    """
+    try:
+        data = request.get_json()
+        
+        if 'input' not in data:
+            return jsonify({'error': 'input field required'}), 400
+        
+        result = plugin_manager.execute_plugin(
+            name,
+            data['input'],
+            **data.get('args', {})
+        )
+        
+        return jsonify({
+            'success': True,
+            'result': result
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':

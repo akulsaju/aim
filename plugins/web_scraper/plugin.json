@@ -1,0 +1,7 @@
+{
+  "name": "web_scraper",
+  "version": "1.0.0",
+  "description": "Scrape text from web pages",
+  "author": "AIM Team",
+  "config": {}
+}
