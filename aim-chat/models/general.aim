@@ -1,0 +1,33 @@
+{
+  "name": "GeneralAI",
+  "version": "1.0",
+  "type": "chat",
+  "description": "General knowledge chatbot covering various topics",
+  "knowledge": [
+    "Python is a high-level programming language known for its simplicity.",
+    "JavaScript is the programming language of the web.",
+    "HTML stands for HyperText Markup Language.",
+    "CSS is used to style and design web pages.",
+    "Machine learning is a subset of artificial intelligence.",
+    "Artificial intelligence enables machines to simulate human intelligence.",
+    "The Internet is a global network of interconnected computers.",
+    "HTTP stands for HyperText Transfer Protocol.",
+    "A database is an organized collection of data.",
+    "SQL is used to manage and query relational databases.",
+    "Git is a version control system for tracking code changes.",
+    "An algorithm is a step-by-step procedure for solving a problem.",
+    "Cloud computing delivers computing services over the Internet.",
+    "APIs allow different software applications to communicate.",
+    "Open source software has source code that anyone can inspect and modify.",
+    "Encryption protects data by converting it into a coded format.",
+    "The CPU is the brain of the computer that executes instructions.",
+    "RAM is temporary memory used by the computer while running programs.",
+    "The hard drive stores data permanently even when the computer is off.",
+    "A compiler translates high-level code into machine code.",
+    "Debugging is the process of finding and fixing errors in code.",
+    "Binary is the base-2 number system used by computers.",
+    "The operating system manages computer hardware and software resources.",
+    "Networking connects computers to share resources and information.",
+    "Cybersecurity protects systems and data from digital attacks."
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "SolarAI",
+  "version": "1.0",
+  "type": "chat",
+  "description": "Knowledge about the Solar System and astronomy",
+  "knowledge": [
+    "The Sun is the star at the center of the Solar System.",
+    "The Solar System consists of the Sun and objects that orbit it.",
+    "The Sun provides energy for life on Earth.",
+    "Earth is the third planet from the Sun.",
+    "Mars is known as the Red Planet due to iron oxide on its surface.",
+    "Jupiter is the largest planet in the Solar System.",
+    "Saturn is famous for its beautiful ring system.",
+    "Mercury is the closest planet to the Sun.",
+    "Venus is the second planet from the Sun and the hottest planet.",
+    "Neptune is the farthest planet from the Sun in our Solar System.",
+    "The Moon is Earth's only natural satellite.",
+    "Asteroids are small rocky bodies that orbit the Sun.",
+    "Comets are icy bodies that develop tails when approaching the Sun.",
+    "The Solar System formed about 4.6 billion years ago.",
+    "Planets orbit the Sun due to gravitational attraction.",
+    "The Sun contains 99.86% of the Solar System's total mass.",
+    "Earth completes one orbit around the Sun in 365.25 days.",
+    "A light-year is the distance light travels in one year.",
+    "Stars are massive balls of hot gas that produce light and heat.",
+    "Galaxies are massive systems containing billions of stars.",
+    "The Milky Way is the galaxy that contains our Solar System.",
+    "Black holes are regions of space with extremely strong gravity.",
+    "The Big Bang theory explains the origin of the universe.",
+    "Space is a near-perfect vacuum with very few particles.",
+    "Gravity keeps planets in orbit around stars."
+  ]
+}
