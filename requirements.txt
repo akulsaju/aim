@@ -1,0 +1,16 @@
+# AIM Studio - Python Dependencies
+
+# Web Framework
+Flask==2.3.0
+Werkzeug==2.3.0
+
+# CORS Support for Frontend-Backend Communication
+Flask-CORS==4.0.0
+
+# Optional: For better JSON handling
+# python-json-logger==2.0.7
+
+# Development Dependencies (optional)
+# pytest==7.4.0
+# black==23.3.0
+# flake8==6.0.0
