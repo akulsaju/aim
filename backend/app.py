@@ -597,7 +597,9 @@ def registry_list():
 @app.route('/api/v3/registry/search', methods=['GET'])
 def registry_search():
     """
-    Search public registry (aimhub.org).
+    Search local or public registry.
+    
+    Created by @akulsaju - https://github.com/akulsaju
     
     Query parameters:
         ?q=query&tags=tag1,tag2&limit=10
@@ -607,7 +609,7 @@ def registry_search():
         tags = request.args.get('tags', '').split(',') if request.args.get('tags') else []
         limit = int(request.args.get('limit', 10))
         
-        client = RegistryClient('https://aimhub.org')
+        client = RegistryClient('http://localhost:8000')
         results = client.search(query, tags=tags, limit=limit)
         
         return jsonify({

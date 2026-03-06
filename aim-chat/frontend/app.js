@@ -203,8 +203,13 @@ function addMessage(role, content) {
     
     messagesContainer.appendChild(messageDiv);
     
-    // Scroll to bottom
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    // Smooth scroll to bottom
+    setTimeout(() => {
+        messagesContainer.scrollTo({
+            top: messagesContainer.scrollHeight,
+            behavior: 'smooth'
+        });
+    }, 100);
 }
 
 /**
@@ -273,6 +278,248 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+/**
+ * Show modal dialog
+ */
+function showModal(modalId) {
+    document.getElementById(modalId).classList.add('active');
+}
+
+/**
+ * Close modal dialog
+ */
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+}
+
+/**
+ * Show add knowledge modal
+ */
+function showAddDataModal() {
+    if (!isModelLoaded) {
+        showToast('Please load or create a model first!', 2500);
+        return;
+    }
+    showModal('addDataModal');
+}
+
+/**
+ * Show create model modal
+ */
+function showCreateModelModal() {
+    showModal('createModelModal');
+}
+
+/**
+ * Add new knowledge to current model
+ */
+async function addKnowledge() {
+    const textarea = document.getElementById('newKnowledge');
+    const text = textarea.value.trim();
+    
+    if (!text) {
+        showToast('Please enter knowledge sentences!', 2000);
+        return;
+    }
+    
+    // Split by newlines and filter empty
+    const sentences = text.split('\n')
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+    
+    if (sentences.length === 0) {
+        showToast('No valid sentences found!', 2000);
+        return;
+    }
+    
+    showLoading();
+    
+    try {
+        const response = await fetch(`${API_BASE}/add_knowledge`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ knowledge: sentences })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showToast(`✅ Added ${sentences.length} knowledge sentences!`, 2500);
+            textarea.value = '';
+            closeModal('addDataModal');
+            
+            // Update model info
+            if (currentModel) {
+                currentModel.knowledge_count = data.total_knowledge;
+                updateModelInfo(currentModel);
+            }
+        } else {
+            showToast(`Error: ${data.error}`, 3000);
+        }
+    } catch (error) {
+        showToast('Failed to add knowledge', 2500);
+    } finally {
+        hideLoading();
+    }
+}
+
+/**
+ * Create a new model
+ */
+async function createModel() {
+    const name = document.getElementById('newModelName').value.trim();
+    const version = document.getElementById('newModelVersion').value.trim() || '1.0';
+    const description = document.getElementById('newModelDesc').value.trim();
+    const knowledgeText = document.getElementById('newModelKnowledge').value.trim();
+    
+    if (!name) {
+        showToast('Model name is required!', 2000);
+        return;
+    }
+    
+    if (!knowledgeText) {
+        showToast('Knowledge sentences are required!', 2000);
+        return;
+    }
+    
+    // Split knowledge into sentences
+    const knowledge = knowledgeText.split('\n')
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+    
+    if (knowledge.length < 3) {
+        showToast('Please add at least 3 knowledge sentences!', 2500);
+        return;
+    }
+    
+    showLoading();
+    
+    try {
+        const response = await fetch(`${API_BASE}/create_model`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name,
+                version,
+                description: description || `Custom knowledge model: ${name}`,
+                knowledge
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            currentModel = data.model_info;
+            isModelLoaded = true;
+            updateModelInfo(data.model_info);
+            showChatArea();
+            clearMessages();
+            
+            showToast(`✅ Model "${name}" created and loaded!`, 2500);
+            
+            // Clear form
+            document.getElementById('newModelName').value = '';
+            document.getElementById('newModelVersion').value = '1.0';
+            document.getElementById('newModelDesc').value = '';
+            document.getElementById('newModelKnowledge').value = '';
+            
+            closeModal('createModelModal');
+        } else {
+            showToast(`Error: ${data.error}`, 3000);
+        }
+    } catch (error) {
+        showToast('Failed to create model', 2500);
+    } finally {
+        hideLoading();
+    }
+}
+
+/**
+ * Create and save model to file
+ */
+async function createAndSaveModel() {
+    const name = document.getElementById('newModelName').value.trim();
+    const version = document.getElementById('newModelVersion').value.trim() || '1.0';
+    const description = document.getElementById('newModelDesc').value.trim();
+    const knowledgeText = document.getElementById('newModelKnowledge').value.trim();
+    
+    if (!name) {
+        showToast('Model name is required!', 2000);
+        return;
+    }
+    
+    if (!knowledgeText) {
+        showToast('Knowledge sentences are required!', 2000);
+        return;
+    }
+    
+    const knowledge = knowledgeText.split('\n')
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+    
+    if (knowledge.length < 3) {
+        showToast('Please add at least 3 knowledge sentences!', 2500);
+        return;
+    }
+    
+    showLoading();
+    
+    try {
+        // First create the model
+        const createResponse = await fetch(`${API_BASE}/create_model`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name,
+                version,
+                description: description || `Custom knowledge model: ${name}`,
+                knowledge
+            })
+        });
+        
+        const createData = await createResponse.json();
+        
+        if (!createResponse.ok) {
+            showToast(`Error: ${createData.error}`, 3000);
+            hideLoading();
+            return;
+        }
+        
+        // Then save it
+        const saveResponse = await fetch(`${API_BASE}/save_model`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const saveData = await saveResponse.json();
+        
+        if (saveResponse.ok) {
+            currentModel = createData.model_info;
+            isModelLoaded = true;
+            updateModelInfo(createData.model_info);
+            showChatArea();
+            clearMessages();
+            
+            showToast(`✅ Model saved as ${saveData.filename}!`, 3000);
+            
+            // Clear form and reload models list
+            document.getElementById('newModelName').value = '';
+            document.getElementById('newModelVersion').value = '1.0';
+            document.getElementById('newModelDesc').value = '';
+            document.getElementById('newModelKnowledge').value = '';
+            
+            closeModal('createModelModal');
+            loadAvailableModels();
+        } else {
+            showToast(`Created but failed to save: ${saveData.error}`, 3000);
+        }
+    } catch (error) {
+        showToast('Failed to create and save model', 2500);
+    } finally {
+        hideLoading();
+    }
 }
 
 // Refresh status every 10 seconds

@@ -81,17 +81,18 @@ class Registry:
 
 class RegistryClient:
     """
-    Client for interacting with AIM Hub registry.
+    Client for interacting with model registries.
     
-    Handles searching, downloading, and uploading models.
+    Note: Currently configured for local use only.
+    Created by @akulsaju - https://github.com/akulsaju
     """
     
-    def __init__(self, hub_url: str = "https://aimhub.org", token: str = None):
+    def __init__(self, hub_url: str = "http://localhost:8000", token: str = None):
         """
         Initialize registry client.
         
         Args:
-            hub_url: URL of AIM Hub registry
+            hub_url: URL of model registry (default: local)
             token: API token for authenticated requests
         """
         self.hub_url = hub_url.rstrip('/')

@@ -26,7 +26,9 @@ aim install wikipedia-ai
 aim publish mymodel.aim
 ```
 
-### 🌐 Model Hub (aimhub.org)
+### 🌐 Model Registry (Local)
+
+**Created by:** [@akulsaju](https://github.com/akulsaju)
 Central registry for discovering and sharing models - coming soon!
 
 ### 🔌 Plugin System

@@ -153,7 +153,7 @@ def info(model_file: str):
 
 @cli.command()
 @click.argument('model_name')
-@click.option('--registry', default='https://aimhub.org', help='Registry URL')
+@click.option('--registry', default='http://localhost:8000', help='Registry URL (local server)')
 def install(model_name: str, registry: str):
     """
     Install a model from AIM Hub registry.
@@ -193,7 +193,7 @@ def install(model_name: str, registry: str):
 
 @cli.command()
 @click.argument('model_file', type=click.Path(exists=True))
-@click.option('--registry', default='https://aimhub.org', help='Registry URL')
+@click.option('--registry', default='http://localhost:8000', help='Registry URL (local server)')
 @click.option('--token', prompt=True, hide_input=True, help='API token for publishing')
 def publish(model_file: str, registry: str, token: str):
     """
@@ -241,7 +241,7 @@ def list_engines_cmd():
 @click.option('--query', '-q', help='Search query')
 @click.option('--tag', '-t', multiple=True, help='Filter by tag')
 @click.option('--limit', type=int, default=10, help='Number of results')
-@click.option('--registry', default='https://aimhub.org', help='Registry URL')
+@click.option('--registry', default='http://localhost:8000', help='Registry URL (local server)')
 def search(query: str, tag: list, limit: int, registry: str):
     """
     Search for models in AIM Hub.

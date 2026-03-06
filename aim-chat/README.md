@@ -2,6 +2,8 @@
 
 A simple, lightweight ChatGPT-like chatbot application that runs 100% locally. Load `.aim` knowledge models and chat with your own AI assistant!
 
+**Created by:** [@akulsaju](https://github.com/akulsaju)
+
 ## 🌟 Features
 
 - **Simple Chat Interface** - Clean, ChatGPT-style UI
@@ -228,6 +230,6 @@ This is a beginner-friendly project! Contributions welcome:
 
 ---
 
-**Built with ❤️ for simplicity and learning**
+**Built with ❤️ by [@akulsaju](https://github.com/akulsaju)**
 
 Start chatting with your AI assistant today! 🚀

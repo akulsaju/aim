@@ -47,7 +47,7 @@ class ChatEngine:
             'to', 'was', 'will', 'with', 'what', 'when', 'where', 'who', 'why',
             'how', 'i', 'you', 'me', 'my', 'we', 'us', 'am', 'do', 'does',
             'can', 'could', 'should', 'would', 'may', 'might', 'this', 'these',
-            'those', 'tell', 'about', 'give', 'show', 'explain'
+            'those', 'tell', 'about', 'give', 'show', 'explain', 'get', 'make'
         }
         
         # Filter out stopwords and short words
@@ -64,19 +64,31 @@ class ChatEngine:
             keywords: List of keywords from user query
             
         Returns:
-            int: Relevance score (higher is better)
+            float: Relevance score (higher is better)
         """
         sentence_lower = sentence.lower()
-        score = 0
+        sentence_words = set(re.findall(r'\b\w+\b', sentence_lower))
+        score = 0.0
         
         for keyword in keywords:
-            # Count how many times the keyword appears in the sentence
-            count = sentence_lower.count(keyword)
-            score += count
-            
-            # Bonus points for exact word match (not just substring)
-            if re.search(r'\b' + re.escape(keyword) + r'\b', sentence_lower):
-                score += 2
+            # Exact word match - highest score
+            if keyword in sentence_words:
+                score += 10.0
+            # Partial match (substring)
+            elif keyword in sentence_lower:
+                score += 3.0
+            # Similar words (e.g., sun/solar, earth/planet)
+            else:
+                for word in sentence_words:
+                    # Check if words share significant overlap
+                    if len(keyword) >= 4 and len(word) >= 4:
+                        if keyword[:3] == word[:3]:
+                            score += 1.5
+        
+        # Bonus for multiple keyword matches
+        matches = sum(1 for kw in keywords if kw in sentence_words)
+        if matches > 1:
+            score += matches * 2
         
         return score
     
@@ -97,7 +109,7 @@ class ChatEngine:
         keywords = self.extract_keywords(user_message)
         
         if not keywords:
-            return "I'm not sure what you're asking. Could you rephrase your question?"
+            return "Could you ask a more specific question? I'll do my best to help!"
         
         # Calculate relevance for each knowledge sentence
         scored_sentences = []
@@ -106,12 +118,26 @@ class ChatEngine:
             if score > 0:
                 scored_sentences.append((sentence, score))
         
-        # If no matches found, return a default response
+        # If no matches found, try to suggest related topics
         if not scored_sentences:
+            # Show what topics are available
+            sample_topics = []
+            for sentence in self.knowledge_base[:5]:
+                words = re.findall(r'\b[A-Z][a-z]+\b', sentence)
+                if words:
+                    sample_topics.extend(words[:2])
+            
+            if sample_topics:
+                topics = ', '.join(set(sample_topics[:5]))
+                return f"I don't have information about that. Try asking about: {topics}"
             return "I don't have information about that. Try asking something else!"
         
         # Sort by relevance (highest score first)
         scored_sentences.sort(key=lambda x: x[1], reverse=True)
+        
+        # If best score is very low, inform user
+        if scored_sentences[0][1] < 3:
+            return f"I'm not very confident, but here's what I found: {scored_sentences[0][0]}"
         
         # Return the best match
         return scored_sentences[0][0]
