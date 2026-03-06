@@ -1,53 +1,440 @@
-# 🎯 AIM Studio
+# 🎯 AIM v3 - Open AI Model Ecosystem
 
-**A lightweight desktop application for training simple AI text models using Markov chains**
+**Git for AI models + App Store for AI**
 
-AIM Studio lets anyone create, train, and share text generation models without complex AI infrastructure. Train models on your own text data and export them as `.aim` files that others can use!
-
----
-
-## 📋 Table of Contents
-
-- [Features](#features)
-- [What is AIM Studio?](#what-is-aim-studio)
-- [How It Works](#how-it-works)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Using AIM Studio](#using-aim-studio)
-- [.AIM File Format](#aim-file-format)
-- [Project Structure](#project-structure)
-- [API Documentation](#api-documentation)
-- [Examples](#examples)
-- [Contributing](#contributing)
-- [License](#license)
+AIM makes it easy to **create**, **export**, **share**, and **run** AI models like software packages.
 
 ---
 
-## ✨ Features
+## ✨ What's New in v3
 
-- **🎓 Easy Training**: Upload text files or paste text directly to train models
-- **🤖 Text Generation**: Generate new text based on learned patterns
-- **💾 Model Export**: Save trained models as portable `.aim` files
-- **📂 Model Loading**: Load and run `.aim` files created by you or others
-- **🎨 Clean UI**: Simple, intuitive interface for all skill levels
-- **🔧 Customizable**: Adjust model complexity and generation parameters
-- **🌐 Open Source**: Free and open for everyone to use and modify
+### 🎁 Universal Model Format
+Every model is a `.aim` file - a portable package containing metadata, configuration, and trained weights.
+
+### 🔧 Multiple Engines
+- **Markov** - Statistical text generation ✅
+- **N-gram** - Language models ✅
+- **Embedding** - Semantic similarity 📋
+- **LLM** - Large Language Models 📋
+
+### 📦 Package Manager
+Install and manage models like npm packages:
+```bash
+aim train data.txt --name "my-model"
+aim run mymodel.aim --prompt "text"
+aim install wikipedia-ai
+aim publish mymodel.aim
+```
+
+### 🌐 Model Hub (aimhub.org)
+Central registry for discovering and sharing models - coming soon!
+
+### 🔌 Plugin System
+Extend AIM with custom functionality:
+- `pdf_reader` - Extract text from PDFs
+- `web_scraper` - Scrape web pages  
+- `image_generator` - Generate images from text
+- Create custom plugins easily
+
+### 💾 Multi-Format Data Loading
+Train from `.txt`, `.md`, `.csv`, `.json`, `.pdf` files
 
 ---
 
-## 🤔 What is AIM Studio?
+## 🚀 Quick Start
 
-AIM Studio is a beginner-friendly platform for creating text generation AI models using **Markov chains** - a simple but powerful statistical method for learning text patterns.
+### 1. Installation
 
-### What are Markov Chains?
+```bash
+# Clone repository
+git clone https://github.com/user/aim
+cd aim
 
-A Markov chain model learns which words typically follow other words in your training text. For example, if you train it on fantasy stories, it learns that "once upon" is often followed by "a time", or that "magic" might be followed by "spell", "wand", or "power".
+# Install dependencies
+pip install -r requirements.txt
 
-### Use Cases
+# Install AIM CLI
+pip install -e aim_cli/
+```
 
-- Create chatbots with specific personality styles
-- Generate creative writing prompts
-- Build text completion tools
+### 2. Train Your First Model
+
+```bash
+# Create training data
+echo "Your training text here..." > data.txt
+
+# Train a model
+aim train data.txt --name "my-model" --author "Your Name"
+
+# Run the model
+aim run my-model.aim --prompt "Start text" --length 100
+```
+
+### 3. Use in Python
+
+```python
+from aim_core import AIMModel
+
+# Create and train
+model = AIMModel.create(name="My Model", author="You", engine="markov")
+model.train(text_data)
+
+# Generate
+output = model.generate(prompt="Once ", max_length=100)
+
+# Save
+model.save("mymodel.aim")
+
+# Load
+model = AIMModel.load("mymodel.aim")
+```
+
+### 4. Web Interface
+
+```bash
+cd backend
+python app.py
+# Visit http://localhost:5000
+```
+
+---
+
+## 📚 Project Structure
+
+```
+aim/
+├── aim_core/              # Core AIM system
+│   ├── manifest.py       # Model format & metadata
+│   ├── model.py          # AIM Model class
+│   ├── engines.py        # AI engines
+│   └── plugins.py        # Plugin system
+│
+├── aim_cli/              # Command-line interface
+│   ├── aim.py            # CLI commands
+│   └── trainer.py        # Dataset loading
+│
+├── aim_hub/              # Registry & package management
+│   └── registry.py       # Local & remote registries
+│
+├── plugins/              # Extensible plugins
+│   ├── pdf_reader/
+│   ├── web_scraper/
+│   └── image_generator/
+│
+├── backend/              # Flask REST API
+│   ├── app.py            # Flask application
+│   ├── trainer.py        # Legacy trainer
+│   └── generator.py      # Legacy generator
+│
+├── frontend/             # Web UI
+│   ├── index.html
+│   ├── app.js
+│   └── style.css
+│
+├── models/               # Saved .aim files
+│   └── fantasy_story_generator.aim
+│
+├── docs/                 # Documentation
+│   ├── AIM_FORMAT.md
+│   ├── API_REFERENCE.md
+│   └── PLUGIN_GUIDE.md
+│
+├── AIM_V3_GUIDE.md       # Complete v3 guide
+└── requirements.txt      # Dependencies
+```
+
+---
+
+## 🎓 Learning Path
+
+**Absolute Beginner:**
+1. Read [AIM_V3_GUIDE.md](AIM_V3_GUIDE.md) (10 min)
+2. Run Quick Start above (15 min)
+3. Explore examples: `python examples/quick_examples.py`
+
+**Intermediate:**
+1. Read [docs/AIM_FORMAT.md](docs/AIM_FORMAT.md) - understand .aim files
+2. Try different engines
+3. Create your own models
+4. Use plugins
+
+**Advanced:**
+1. Read [docs/PLUGIN_GUIDE.md](docs/PLUGIN_GUIDE.md)
+2. Create custom plugins
+3. Contribute engines
+4. Deploy private hub
+
+---
+
+## 📖 Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [AIM_V3_GUIDE.md](AIM_V3_GUIDE.md) | Complete guide to AIM v3 |
+| [docs/AIM_FORMAT.md](docs/AIM_FORMAT.md) | .aim file format specification |
+| [docs/API_REFERENCE.md](docs/API_REFERENCE.md) | REST API reference |
+| [docs/PLUGIN_GUIDE.md](docs/PLUGIN_GUIDE.md) | Creating plugins |
+
+---
+
+## 🔌 Available Plugins
+
+### pdf_reader
+Extract text from PDF files for training.
+
+```python
+from aim_core.plugins import get_plugin_manager
+
+manager = get_plugin_manager()
+text = manager.execute_plugin('pdf_reader', '/path/to/file.pdf')
+```
+
+### web_scraper
+Scrape text from web pages.
+
+```python
+text = manager.execute_plugin('web_scraper', 'https://example.com')
+```
+
+### image_generator
+Generate images from text descriptions (requires API).
+
+```python
+result = manager.execute_plugin('image_generator', 'A cat on a beach')
+```
+
+---
+
+## 💻 CLI Commands
+
+```bash
+# Training
+aim train <file>                    # Train model from file
+aim train <file> --engine ngram     # Use specific engine
+aim train <file> --order 3          # Markov order
+
+# Running Models
+aim run <model.aim>                 # Interactive mode
+aim run <model.aim> --prompt "text" # With prompt
+aim run <model.aim> --length 200    # Custom length
+
+# Model Management
+aim info <model.aim>                # Show model info
+aim list-engines                    # List available engines
+aim search --query "biology"        # Search hub
+aim install <model-name>            # Install from hub
+aim publish <model.aim>             # Publish to hub
+
+# Help
+aim --help
+aim train --help
+```
+
+---
+
+## 🌐 REST API
+
+The Flask server provides REST endpoints:
+
+```bash
+# Get available engines
+GET /api/v3/engines
+
+# Train model
+POST /api/v3/train
+Body: {"name": "...", "text": "...", "engine": "markov"}
+
+# Generate text
+POST /api/v3/generate
+Body: {"prompt": "...", "max_length": 100}
+
+# Save model
+POST /api/v3/save
+Body: {"filename": "model.aim"}
+
+# Load model
+POST /api/v3/load
+File upload or {"path": "/path/to/model.aim"}
+
+# List plugins
+GET /api/v3/plugins
+
+# Execute plugin
+POST /api/v3/plugins/<name>/execute
+Body: {"input": "data"}
+```
+
+See [docs/API_REFERENCE.md](docs/API_REFERENCE.md) for complete API reference.
+
+---
+
+## 🧪 Examples
+
+### Train from Text File
+
+```bash
+aim train examples/sample_text.txt --name "story-generator"
+aim run story-generator.aim --prompt "Once upon"
+```
+
+### Use Different Engines
+
+```bash
+# Markov chain (simple, fast)
+aim train data.txt --name model1 --engine markov --order 2
+
+# N-gram (more sophisticated)
+aim train data.txt --name model2 --engine ngram
+
+# Compare generations
+aim run model1.aim --prompt "The"
+aim run model2.aim --prompt "The"
+```
+
+### Publish and Share
+
+```bash
+# Save locally
+aim train data.txt --name "my-awesome-model"
+
+# Publish to hub
+aim publish my-awesome-model.aim --token YOUR_TOKEN
+
+# Others can install it
+aim install my-awesome-model
+```
+
+### Use in Your Project
+
+```python
+from aim_core import AIMModel
+
+# Load pre-trained model
+model = AIMModel.load("biology_tutor.aim")
+
+# Generate responses
+for question in questions:
+    answer = model.generate(prompt=question, max_length=200)
+    print(f"Q: {question}")
+    print(f"A: {answer}\n")
+```
+
+---
+
+## 🛠️ Development
+
+### Install for Development
+
+```bash
+git clone https://github.com/user/aim
+cd aim
+pip install -r requirements.txt
+pip install -e aim_cli/
+```
+
+### Run Tests
+
+```bash
+pytest tests/
+```
+
+### Project Roadmap
+
+- [x] Universal .aim format
+- [x] Markov & N-gram engines
+- [x] CLI tool (aim command)
+- [x] Plugin system
+- [x] REST API
+- [ ] AIM Hub (aimhub.org) - Deploy and host
+- [ ] Embedding engine
+- [ ] LLM engine support
+- [ ] Web-based trainer
+- [ ] Collaborative model training
+- [ ] Mobile app
+- [ ] GUI desktop application
+
+---
+
+## 🤝 Contributing
+
+Contributions welcome! Areas to contribute:
+
+1. **New Engines** - Implement embedding, LLM engines
+2. **Plugins** - Create pdf_reader, web_scraper, voice_ai, etc.
+3. **Documentation** - Improve guides and examples
+4. **Testing** - Add test coverage
+5. **UI/UX** - Improve web interface
+6. **Hub** - Deploy aimhub.org registry
+
+See [docs/CONTRIBUTION_GUIDE.md](docs/CONTRIBUTION_GUIDE.md) for details.
+
+---
+
+## 📊 Features Comparison
+
+| Feature | AIM | Hugging Face | PyTorch | n/a |
+|---------|-----|--------------|---------|-----|
+| Lightweight | ✅ | ❌ | ❌ | - |
+| Local-first | ✅ | ❌ | ✅ | - |
+| Simple API | ✅ | ⚠️ | ❌ | - |
+| Model Sharing | ✅ | ✅ | ⚠️ | - |
+| Package Manager | ✅ | ❌ | ❌ | - |
+| Multiple Engines | ✅ | ✅ | ❌ | - |
+| Plugin System | ✅ | ❌ | ❌ | - |
+
+---
+
+## ❓ FAQ
+
+**Q: Is AIM for beginners?**
+A: Yes! AIM is designed to be beginner-friendly while remaining powerful for advanced users.
+
+**Q: Can I use LLMs?**
+A: LLM support is coming in v3.1. Currently supports Markov and N-gram engines.
+
+**Q: How large can models be?**
+A: Typically 100KB - 10MB. Depends on engine and training data.
+
+**Q: Is it free?**
+A: Yes! MIT License - free for personal and commercial use.
+
+**Q: Can I deploy models?**
+A: Yes! Models can run locally, behind a web API, or on cloud platforms.
+
+**Q: How does aimhub.org work?**
+A: Central registry for discovering and installing models (like npm or pip). Optional - use AIM entirely offline.
+
+---
+
+## 📜 License
+
+MIT License - See [LICENSE](LICENSE)
+
+---
+
+## 🙏 Acknowledgments
+
+Inspired by:
+- **npm** - Package management simplicity
+- **Docker** - Containerization and distribution
+- **PyTorch** - ML framework accessibility
+- **Hugging Face** - Model sharing community
+
+---
+
+## 📞 Support & Community
+
+- 📖 **Docs**: [AIM_V3_GUIDE.md](AIM_V3_GUIDE.md)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/)
+- 📧 **Email**: support@aimhub.org
+- 🐦 **Twitter**: [@aimhub_org](https://twitter.com/)
+
+---
+
+**Made with ❤️ to democratize AI**
+
+*Latest: AIM v3.0 - March 2026*
 - Learn about natural language processing
 - Experiment with AI text generation
 - Share custom models with friends or the community

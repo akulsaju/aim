@@ -1,0 +1,90 @@
+{
+  "name": "biology-tutor",
+  "version": "2.1.0",
+  "author": "Dr. Sarah Johnson",
+  "description": "Comprehensive biology tutor trained on high school biology textbooks, university lecture notes, and scientific papers. Provides detailed answers to biology questions with proper terminology and explanations suitable for students aged 14-18.",
+  
+  "type": "text",
+  "engine": "markov",
+  "license": "CC-BY-4.0",
+  
+  "created": "2026-02-15T10:30:00Z",
+  "updated": "2026-03-06T15:45:00Z",
+  
+  "tags": [
+    "biology",
+    "education",
+    "tutor",
+    "science",
+    "learning",
+    "q&a"
+  ],
+  
+  "source": "Khan Academy, Wikipedia Biology Articles, OpenStax Textbooks, University Lecture Notes",
+  "homepage": "https://example.com/biology-tutor",
+  "repository": "https://github.com/aimhub-examples/biology-tutor",
+  
+  "files": {
+    "model": "model.json",
+    "metadata": "training.json",
+    "readme": "README.md",
+    "examples": "examples.json"
+  },
+  
+  "dependencies": {
+    "python": ">=3.8"
+  },
+  
+  "metadata": {
+    "training_samples": 50000,
+    "vocabulary_size": 8932,
+    "training_duration_minutes": 240,
+    "avg_response_quality": 0.92,
+    "data_sources": [
+      "Khan Academy Biology Course",
+      "Wikipedia Biology Articles",
+      "OpenStax Biology Textbook",
+      "University Lecture Notes",
+      "Scientific Papers"
+    ],
+    "training_algorithms": [
+      "Markov Chain (order 2)",
+      "Markov Chain (order 3)"
+    ],
+    "tested_on": [
+      "SAT Biology Questions",
+      "AP Biology Exam",
+      "General Biology Courses"
+    ]
+  },
+  
+  "engine_config": {
+    "order": 2,
+    "min_word_frequency": 2,
+    "max_vocabulary_size": 10000,
+    "temperature": 0.9,
+    "use_start_tokens": true
+  },
+  
+  "usage_examples": [
+    {
+      "question": "What is photosynthesis?",
+      "input_prompt": "photosynthesis is",
+      "expected_output": "Detailed explanation of photosynthesis, light reactions, and dark reactions"
+    },
+    {
+      "question": "Explain cellular respiration",
+      "input_prompt": "cellular respiration is",
+      "expected_output": "Explanation including glycolysis, Krebs cycle, and electron transport chain"
+    }
+  ],
+  
+  "ratings": {
+    "average": 4.8,
+    "total_reviews": 245,
+    "helpful_reviews": 215
+  },
+  
+  "downloads": 12540,
+  "last_updated": "2026-03-06"
+}
