@@ -78,7 +78,29 @@
                             <small class="hint">Minimum 50 words recommended</small>
                         </div>
 
-                        <div class="form-row">
+                        <div class="form-group">
+                            <label>AI Engine</label>
+                            <select id="engineType" onchange="toggleEngineOptions()">
+                                <option value="llm" selected>🤖 LLM (ChatGPT-like) - Best Quality</option>
+                                <option value="markov">📊 Markov Chain - Fast, Simple</option>
+                                <option value="ngram">📈 N-gram - Pattern-based</option>
+                            </select>
+                            <small class="hint">LLM provides coherent, grammatical responses</small>
+                        </div>
+
+                        <div id="llmOptions">
+                            <div class="form-group">
+                                <label>OpenAI API Key (Optional)</label>
+                                <input 
+                                    type="password"
+                                    id="apiKey"
+                                    placeholder="sk-... (leave empty for demo mode)"
+                                >
+                                <small class="hint">For production quality. Get key at <a href="https://platform.openai.com/api-keys" target="_blank" style="color: #6366f1;">platform.openai.com</a></small>
+                            </div>
+                        </div>
+
+                        <div id="markovOptions" style="display:none;">
                             <div class="form-group">
                                 <label>Model Order</label>
                                 <select id="modelOrder">

@@ -240,23 +240,123 @@ class EmbeddingEngine(BaseEngine):
 
 
 class LLMEngine(BaseEngine):
-    """Large Language Model engine (OpenAI, Hugging Face, etc.)."""
+    """Large Language Model engine supporting multiple providers."""
     
+    def __init__(self, config: Dict[str, Any] = None):
+        super().__init__(config)
+        self.provider = self.config.get("provider", "openai")
+        self.api_key = self.config.get("api_key", None)
+        self.model = self.config.get("model", "gpt-3.5-turbo")
+        self.context = self.config.get("context", "You are a helpful AI assistant.")
+        self.training_data = []
+        
     def train(self, data: Any, **kwargs) -> Dict[str, Any]:
-        """Configure LLM engine."""
-        return {"status": "LLM engine uses pre-trained models"}
+        """Store training data as context for LLM."""
+        if isinstance(data, str):
+            self.training_data.append(data)
+            self.context = f"You are an AI trained on the following content:\n\n{data[:1000]}...\n\nUse this context to answer questions."
+        
+        return {
+            "status": "LLM configured with context",
+            "context_length": len(self.training_data),
+            "provider": self.provider
+        }
     
     def generate(self, prompt: str = None, **kwargs) -> str:
-        """Generate text using LLM."""
-        return "LLM generation requires API keys"
+        """Generate text using LLM API."""
+        max_length = kwargs.get("max_length", 100)
+        temperature = kwargs.get("temperature", 0.7)
+        
+        if not prompt:
+            prompt = "Generate some interesting content."
+        
+        # Try OpenAI if configured
+        if self.provider == "openai" and self.api_key:
+            return self._generate_openai(prompt, max_length, temperature)
+        
+        # Fallback to local generation
+        return self._generate_local(prompt, max_length, temperature)
+    
+    def _generate_openai(self, prompt: str, max_length: int, temperature: float) -> str:
+        """Generate using OpenAI API."""
+        try:
+            import requests
+            
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+            
+            data = {
+                "model": self.model,
+                "messages": [
+                    {"role": "system", "content": self.context},
+                    {"role": "user", "content": prompt}
+                ],
+                "max_tokens": max_length,
+                "temperature": temperature
+            }
+            
+            response = requests.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers=headers,
+                json=data,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                return result["choices"][0]["message"]["content"]
+            else:
+                return f"OpenAI API Error: {response.status_code} - {response.text}"
+                
+        except Exception as e:
+            return f"Error calling OpenAI: {str(e)}"
+    
+    def _generate_local(self, prompt: str, max_length: int, temperature: float) -> str:
+        """Fallback: Generate using simple template-based approach."""
+        import random
+        
+        # Simple template responses for demonstration
+        templates = [
+            f"Based on your input '{prompt}', here's a thoughtful response: This is an interesting topic that deserves attention.",
+            f"Regarding '{prompt}', I would say that understanding the context is key to providing meaningful insights.",
+            f"Your question about '{prompt}' is intriguing. Let me share some thoughts on this subject.",
+            f"Thank you for asking about '{prompt}'. This topic has several important aspects worth considering.",
+        ]
+        
+        base_response = random.choice(templates)
+        
+        # Add training context if available
+        if self.training_data:
+            words = self.training_data[0].split()[:50]
+            context_sample = " ".join(words)
+            base_response += f"\n\nDrawing from the training data: {context_sample}"
+        
+        return base_response
     
     def save(self, filepath: str):
         """Save LLM configuration."""
-        pass
+        import json
+        data = {
+            "engine": "llm",
+            "provider": self.provider,
+            "model": self.model,
+            "context": self.context,
+            "training_data": self.training_data
+        }
+        with open(filepath, 'w') as f:
+            json.dump(data, f)
     
     def load(self, filepath: str):
         """Load LLM configuration."""
-        pass
+        import json
+        with open(filepath, 'r') as f:
+            data = json.load(f)
+        self.provider = data.get("provider", "openai")
+        self.model = data.get("model", "gpt-3.5-turbo")
+        self.context = data.get("context", "")
+        self.training_data = data.get("training_data", [])
 
 
 # Engine registry

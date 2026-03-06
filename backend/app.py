@@ -393,8 +393,10 @@ def train_v3():
             "name": "Model Name",
             "author": "Your Name",
             "type": "text",
-            "engine": "markov",
+            "engine": "markov",  // or "llm", "ngram"
             "text": "training data...",
+            "api_key": "sk-...",  // for LLM engine
+            "order": 2,  // for markov/ngram
             "engine_config": { ... }
         }
     """
@@ -409,10 +411,23 @@ def train_v3():
         # Get parameters
         name = data.get('name', 'Untitled Model')
         author = data.get('author', 'Anonymous')
-        engine = data.get('engine', 'markov')
+        engine = data.get('engine', 'llm')  # Default to LLM for better quality
         model_type = data.get('type', 'text')
         text_data = data['text']
         engine_config = data.get('engine_config', {})
+        
+        # Handle LLM-specific config
+        if engine == 'llm':
+            api_key = data.get('api_key', None)
+            if api_key:
+                engine_config['api_key'] = api_key
+            engine_config['provider'] = 'openai'
+            engine_config['model'] = data.get('model', 'gpt-3.5-turbo')
+        
+        # Handle Markov/N-gram specific config
+        if engine in ['markov', 'ngram']:
+            order = data.get('order', 2)
+            engine_config['order'] = order
         
         # Create and train model
         model = AIMModel.create(
@@ -420,7 +435,7 @@ def train_v3():
             author=author,
             engine=engine,
             model_type=model_type,
-            description=data.get('description', '')
+            description=data.get('description', f'Model trained with {engine} engine')
         )
         
         # Train
@@ -429,8 +444,9 @@ def train_v3():
         
         return jsonify({
             'success': True,
-            'message': 'Model trained successfully',
+            'message': f'{engine.upper()} model configured successfully',
             'model': str(model),
+            'engine': engine,
             'stats': stats
         }), 200
         
